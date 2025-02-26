@@ -1,6 +1,8 @@
 package models;
 import users.*;
 import exceptions.*;
+
+import java.sql.SQLOutput;
 import java.util.Arrays;
 
 
@@ -11,19 +13,19 @@ public abstract class Property {
     private boolean isSold;
     private Address address;
 
-    public Property(double sizeInSquareMeters, double price, Address address) {
+    public Property(double sizeInSquareMeters, double price, Address address,boolean isSold) {
         this.sizeInSquareMeters = sizeInSquareMeters;
         this.price = price;
         this.address = address;
-        this.isSold = false;
+        this.isSold = isSold;
     }
 
     public Address getAddress() {
         return address;
     }
 
-    public double getPrice() {
-        return price;
+    public double getPrice(){
+      return price;
     }
 
     public double getSizeInSquareMeters() {
@@ -39,19 +41,15 @@ public abstract class Property {
     }
 
     // Template Method
-    public void displayPropertyInfo() {
+    public void displayInfo() {
         System.out.println("Address: " + address);
-        displaySpecificDetails();  // Hook for subclasses
-        System.out.println("Price: $" + price);
+        System.out.println("Size: " + sizeInSquareMeters + " sqm");
+        System.out.println("Price: $" + getPrice());
         System.out.println("Status: " + (isSold ? "Sold" : "Available"));
     }
 
-    // Hook Method - to be implemented by subclasses
-    protected abstract void displaySpecificDetails();
 
-    public String toFileString() {
-        return sizeInSquareMeters + "," + price + "," + isSold + "," + address.toString();
-    }
+
 
     public static Property fromFileString(String fileString) {
         String[] parts = fileString.split(",");
@@ -60,13 +58,13 @@ public abstract class Property {
         boolean isSold = Boolean.parseBoolean(parts[2]);
         String addressString = String.join(",", Arrays.copyOfRange(parts, 3, parts.length));
         Address address = Address.fromString(addressString);
-        Property property = new Apartment(size, price, address);
+        Property property = new Apartment(size, price, address,isSold);
         property.setSold(isSold);
         return property;
     }
 
     // Restricting edit access to Broker only
-    public void editPropertyDetails(User user, double newPrice, double newSize) throws UnauthorizedEditException{
+    public void setProperty(User user, double newPrice, double newSize) throws UnauthorizedEditException{
         if (!(user instanceof Broker)) {
             throw new UnauthorizedEditException("Only brokers can edit property details.");
         }
@@ -74,5 +72,8 @@ public abstract class Property {
             this.sizeInSquareMeters = newSize;
             System.out.println("Property at " + address + " updated by broker to price: $" + newPrice + " and size: " + newSize + " sqm");
         }
+    // Hook Method - to be implemented by subclasses
+    public abstract void getInfo();
+
     }
 

@@ -19,7 +19,7 @@ public class Broker extends User {
     }
 
     public void editPropertyDetails(Property property, double newPrice, double newSize) throws UnauthorizedEditException {
-        property.editPropertyDetails(this, newPrice, newSize);
+        property.setProperty(this, newPrice, newSize);
     }
     public void loadPropertyList(String dir){
         PropertyManager.getInstance().loadPropertiesFromFile(dir);
