@@ -17,6 +17,6 @@ public class Buyer extends User {
     public void getSoldPropertiesByRadius(Address center, double radius) {
         List<Property> results = PropertyManager.getInstance().getPropertiesWithinRadius(center, radius);
         System.out.println("Sold properties within radius " + radius + ":");
-        results.stream().filter(Property::isSold).forEach(Property::displayPropertyInfo);
+        results.stream().filter(Property::isSold).forEach(Property::displayP  ropertyInfo);
     }
 }

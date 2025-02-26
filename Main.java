@@ -35,7 +35,7 @@ public class Main {
             seller.deleteProperty(propertyToEdit);  // Allowed for seller
 
             try {
-                propertyToEdit.editPropertyDetails(seller, 450000, 105);  // Unauthorized edit
+                propertyToEdit.setProperty(seller, 450000, 105);  // Unauthorized edit
             } catch (UnauthorizedEditException e) {
                 System.out.println("Unauthorized Edit Attempt: " + e.getMessage());
             }
