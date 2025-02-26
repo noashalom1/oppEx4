@@ -13,7 +13,7 @@ public abstract class Property {
     private boolean isSold;
     private Address address;
 
-    public Property(double sizeInSquareMeters, double price, Address address,boolean isSold) {
+    public Property(double sizeInSquareMeters, double price, Address address, boolean isSold) {
         this.sizeInSquareMeters = sizeInSquareMeters;
         this.price = price;
         this.address = address;
@@ -24,8 +24,8 @@ public abstract class Property {
         return address;
     }
 
-    public double getPrice(){
-      return price;
+    public double getPrice() {
+        return price;
     }
 
     public double getSizeInSquareMeters() {
@@ -49,8 +49,6 @@ public abstract class Property {
     }
 
 
-
-
     public static Property fromFileString(String fileString) {
         String[] parts = fileString.split(",");
         double size = Double.parseDouble(parts[0]);
@@ -58,22 +56,21 @@ public abstract class Property {
         boolean isSold = Boolean.parseBoolean(parts[2]);
         String addressString = String.join(",", Arrays.copyOfRange(parts, 3, parts.length));
         Address address = Address.fromString(addressString);
-        Property property = new Apartment(size, price, address,isSold);
+        Property property = new Apartment(size, price, address, isSold);
         property.setSold(isSold);
         return property;
     }
 
     // Restricting edit access to Broker only
-    public void setProperty(User user, double newPrice, double newSize) throws UnauthorizedEditException{
+    public void setProperty(User user, double newPrice, double newSize) throws UnauthorizedEditException {
         if (!(user instanceof Broker)) {
             throw new UnauthorizedEditException("Only brokers can edit property details.");
         }
-            this.price = newPrice;
-            this.sizeInSquareMeters = newSize;
-            System.out.println("Property at " + address + " updated by broker to price: $" + newPrice + " and size: " + newSize + " sqm");
-        }
-    // Hook Method - to be implemented by subclasses
-    public abstract void getInfo();
-
+        this.price = newPrice;
+        this.sizeInSquareMeters = newSize;
+        System.out.println("Property at " + address + " updated by broker to price: $" + newPrice + " and size: " + newSize + " sqm");
     }
 
+    // Hook Method - to be implemented by subclasses
+    public abstract void getInfo();
+}

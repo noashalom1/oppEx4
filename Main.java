@@ -15,9 +15,9 @@ public class Main {
         broker.loadPropertyList("properties.txt");
         broker.listAllProperties();
 
-        // Attempt to add a property with duplicate address
+        // Attempt to add a property with duplicate address-dont need it?
         try { 
-            Property duplicateProperty = new Apartment(150, 550000, new Address(4, 5));
+            Property duplicateProperty = new Apartment(150, 550000, new Address(4, 5),false);
             broker.addProperty(duplicateProperty);
         } catch (DuplicateAddressException e) {
             System.out.println("Error: " + e.getMessage());
@@ -51,27 +51,27 @@ public class Main {
             // 2. Sold properties within radius
             System.out.println("\n--- Sold Properties Within Radius ---");
             PropertyManager.getInstance().getSoldPropertiesWithinRadius(searchCenter, radius)
-                    .forEach(Property::displayPropertyInfo);
+                    .forEach(Property::displayInfo);
 
             // 3. Available properties within radius
             System.out.println("\n--- Available Properties Within Radius ---");
             PropertyManager.getInstance().getAvailablePropertiesWithinRadius(searchCenter, radius)
-                    .forEach(Property::displayPropertyInfo);
+                    .forEach(Property::displayInfo);
 
             // 4. Properties by price comparison within radius
             double targetPricePerSqM = 4000;  // Example target price per square meter
 
             System.out.println("\n--- Properties with Higher Price per SqM ---");
             PropertyManager.getInstance().getPropertiesByPriceComparison(searchCenter, radius, targetPricePerSqM, "higher")
-                    .forEach(Property::displayPropertyInfo);
+                    .forEach(Property::displayInfo);
 
             System.out.println("\n--- Properties with Lower Price per SqM ---");
             PropertyManager.getInstance().getPropertiesByPriceComparison(searchCenter, radius, targetPricePerSqM, "lower")
-                    .forEach(Property::displayPropertyInfo);
+                    .forEach(Property::displayInfo);
 
             System.out.println("\n--- Properties with Equal Price per SqM ---");
             PropertyManager.getInstance().getPropertiesByPriceComparison(searchCenter, radius, targetPricePerSqM, "equal")
-                    .forEach(Property::displayPropertyInfo);
+                    .forEach(Property::displayInfo);
 
         } else {
             System.out.println("No properties loaded to edit.");

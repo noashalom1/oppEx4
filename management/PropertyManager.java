@@ -49,7 +49,7 @@ public class PropertyManager {
     }
 
     public void listAllProperties() {
-        properties.forEach(property -> property.displayPropertyInfo());
+        properties.forEach(property -> property.displayInfo());
     }
 
     public List<Property> getPropertiesWithinRadius(Address center, double radius) {
