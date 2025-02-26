@@ -4,38 +4,46 @@ import exceptions.*;
 import management.PropertyManager;
 
 public class Main {
-    public static void main(String[] args) throws UnauthorizedEditException {
+    public static void main(String[] args) throws UnauthorizedEditException, PropertyNotFoundException, UnauthorizedDeleteException {
         // Create users
         Broker broker = new Broker("John Doe");
         Seller seller = new Seller("Alice Smith", broker);
         Buyer buyer = new Buyer("Bob Johnson");
+        PropertyManager propertyManager = PropertyManager.getInstance();
 
         // Loading properties from file
         System.out.println("\n--- Loading Properties from File ---");
-        broker.loadPropertyList("properties.txt");
-        broker.listAllProperties();
+        propertyManager.loadProperties("properties.txt");
+        propertyManager.listAllProperties();
 
         // Attempt to add a property with duplicate address-dont need it?
         try { 
             Property duplicateProperty = new Apartment(150, 550000, new Address(4, 5),false);
-            broker.addProperty(duplicateProperty);
-        } catch (DuplicateAddressException e) {
+            propertyManager.addProperty(duplicateProperty);
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
 
         // Broker edits property
         if (!PropertyManager.getInstance().getProperties().isEmpty()) {
-            System.out.println("\n--- Broker Edits Property ---");
+            System.out.println("\n--- Broker Edits Property ---");//if null value is entered, the value will not be changed
             Property propertyToEdit = PropertyManager.getInstance().getProperties().get(0);
-            broker.editPropertyDetails(propertyToEdit, 480000, 110);
-            broker.listAllProperties();
+            try {
+                propertyManager.editProperty(broker, propertyToEdit, 480000, 110, null);
+            }
+            catch (Exception e){
+                System.out.println("Error: " + e.getMessage());
+            }
+            propertyManager.getProperties().get(0).getInfo();
+
+
+
+            seller.deleteProperty(propertyToEdit);  // Allowed for seller
 
             // Unauthorized user attempts to edit property
             System.out.println("\n--- Unauthorized User Attempts to Edit Property ---");
-            seller.deleteProperty(propertyToEdit);  // Allowed for seller
-
             try {
-                propertyToEdit.setProperty(seller, 450000, 105);  // Unauthorized edit
+                propertyManager.editProperty(seller,propertyToEdit, 450000, 105,false);  // Unauthorized edit
             } catch (UnauthorizedEditException e) {
                 System.out.println("Unauthorized Edit Attempt: " + e.getMessage());
             }

@@ -4,21 +4,18 @@ import management.PropertyManager;
 import java.util.List;
 
 public class Buyer extends User {
+    private int budget;
+    private List <Property> properties;
 
     public Buyer(String name) {
         super(name);
 
     }
-
-    public void searchPropertiesByRadius(Address center, double radius) {
-        List<Property> results = PropertyManager.getInstance().getPropertiesWithinRadius(center, radius);
-        System.out.println("Properties within radius " + radius + ":");
-        results.forEach(Property::displayInfo);
+    public int getFunds() {
+        return budget;
     }
 
-    public void getSoldPropertiesByRadius(Address center, double radius) {
-        List<Property> results = PropertyManager.getInstance().getPropertiesWithinRadius(center, radius);
-        System.out.println("Sold properties within radius " + radius + ":");
-        results.stream().filter(Property::isSold).forEach(Property::displayInfo);
+    public void setFunds(int newBudget) {
+        budget = newBudget;
     }
 }

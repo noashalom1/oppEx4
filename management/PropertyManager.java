@@ -1,6 +1,10 @@
 package management;
 import exceptions.*;
 import models.*;
+import users.Broker;
+import users.Buyer;
+import users.User;
+
 import java.util.*;
 import java.io.*;
 
@@ -20,27 +24,26 @@ public class PropertyManager {
         return instance;
     }
 
-    public void addProperty(Property property) throws DuplicateAddressException {//i dont need to add new property, we gets the properties from a file
-        for (Property existingProperty : properties) {
-            if (existingProperty.getAddress().equals(property.getAddress())) {
-                // If a property with the same address exists, ignore the new one
-                System.out.println("Property at " + property.getAddress() + " already exists. Skipping addition.");
-                return;
+
+    public void addProperty(Property property) throws DuplicateAddressException,SubUnitException {//i dont need to add new property, we gets the properties from a file
+            List <Property> toRemove = new ArrayList<>();
+            for (Property existingProperty : properties) {
+                if (existingProperty.getAddress().equals(property.getAddress())) throw new DuplicateAddressException("Property at " + property.getAddress() + " already exists. Skipping addition.");
+                if (existingProperty.getAddress().isSubUnitOf(property.getAddress())) throw new SubUnitException("existing property at " + existingProperty.getAddress() + " is a sub-unit of the property that is tried to add. Skipping addition.");
+                if(property.getAddress().isSubUnitOf(existingProperty.getAddress())) {
+                    toRemove.add(existingProperty);
             }
+            }
+            if(!toRemove.isEmpty()){
+                for (Property p:toRemove){
+                    properties.remove(p);
+                }
         }
-
-        // Check if the property is a main unit and has sub-units
-        boolean isMainUnit = property.getAddress().isMainUnit();
-        boolean hasSubUnits = properties.stream()
-                .anyMatch(p -> p.getAddress().isSubUnitOf(property.getAddress()));
-
-        if (!(isMainUnit && hasSubUnits)) {
-            properties.add(property);
-        }
+        properties.add(property);
     }
 
 
-    public void removeProperty(Property property){
+    public void removeProperty(Property property) {
         properties.remove(property);
     }//add exception for property not excited
 
@@ -52,6 +55,7 @@ public class PropertyManager {
         properties.forEach(property -> property.displayInfo());
     }
 
+
     public List<Property> getPropertiesWithinRadius(Address center, double radius) {
         List<Property> result = new ArrayList<>();
         for (Property property : properties) {
@@ -61,6 +65,7 @@ public class PropertyManager {
         }
         return result;
     }
+
     public double getAveragePricePerSquareMeter(Address center, double radius) {
         List<Property> nearbyProperties = getPropertiesWithinRadius(center, radius);
         if (nearbyProperties.isEmpty()) return 0;
@@ -72,6 +77,7 @@ public class PropertyManager {
 
         return totalPricePerSquareMeter / nearbyProperties.size();
     }
+
     public List<Property> getSoldPropertiesWithinRadius(Address center, double radius) {
         List<Property> nearbyProperties = getPropertiesWithinRadius(center, radius);
         List<Property> soldProperties = new ArrayList<>();
@@ -84,6 +90,7 @@ public class PropertyManager {
 
         return soldProperties;
     }
+
     public List<Property> getAvailablePropertiesWithinRadius(Address center, double radius) {
         List<Property> nearbyProperties = getPropertiesWithinRadius(center, radius);
         List<Property> availableProperties = new ArrayList<>();
@@ -96,6 +103,7 @@ public class PropertyManager {
 
         return availableProperties;
     }
+
     public List<Property> getPropertiesByPriceComparison(Address center, double radius, double targetPricePerSquareMeter, String comparison) {
         List<Property> nearbyProperties = getPropertiesWithinRadius(center, radius);
         List<Property> matchedProperties = new ArrayList<>();
@@ -121,17 +129,18 @@ public class PropertyManager {
         return matchedProperties;
     }
 
-    public void loadPropertiesFromFile(String filename) {
+    public void loadProperties(String filename) {
         properties.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+        try  {
+            BufferedReader reader = new BufferedReader(new FileReader(filename));
             String line;
             while ((line = reader.readLine()) != null) {
-                Property property = Property.fromFileString(line);
-                if (property != null) {
+                Property newApartment = Property.fromFileString(line);
+                if (newApartment != null) {
                     try {
-                        addProperty(property);
-                    } catch (DuplicateAddressException e) {
-                        System.err.println("Duplicate property skipped: " + property.getAddress());
+                        addProperty(newApartment);
+                    } catch (DuplicateAddressException | SubUnitException e) {
+                        System.out.println("Error: " + e.getMessage());
                     }
                 }
             }
@@ -140,3 +149,4 @@ public class PropertyManager {
             System.err.println("Error loading properties: " + e.getMessage());
         }
     }
+}
