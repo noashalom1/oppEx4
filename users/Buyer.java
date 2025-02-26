@@ -4,8 +4,10 @@ import management.PropertyManager;
 import java.util.List;
 
 public class Buyer extends User {
+
     public Buyer(String name) {
         super(name);
+
     }
 
     public void searchPropertiesByRadius(Address center, double radius) {

@@ -20,16 +20,27 @@ public class PropertyManager {
         return instance;
     }
 
-    public void addProperty(Property property) throws DuplicateAddressException {
+    public void addProperty(Property property) throws DuplicateAddressException {//i dont need to add new property, we gets the properties from a file
         for (Property existingProperty : properties) {
             if (existingProperty.getAddress().equals(property.getAddress())) {
-                throw new DuplicateAddressException("A property with address " + property.getAddress() + " already exists.");
+                // If a property with the same address exists, ignore the new one
+                System.out.println("Property at " + property.getAddress() + " already exists. Skipping addition.");
+                return;
             }
         }
-        properties.add(property);
+
+        // Check if the property is a main unit and has sub-units
+        boolean isMainUnit = property.getAddress().isMainUnit();
+        boolean hasSubUnits = properties.stream()
+                .anyMatch(p -> p.getAddress().isSubUnitOf(property.getAddress()));
+
+        if (!(isMainUnit && hasSubUnits)) {
+            properties.add(property);
+        }
     }
 
-    public void removeProperty(Property property) {
+
+    public void removeProperty(Property property){
         properties.remove(property);
     }//add exception for property not excited
 
@@ -110,18 +121,6 @@ public class PropertyManager {
         return matchedProperties;
     }
 
-    public void savePropertiesToFile(String filename) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for (Property property : properties) {
-                writer.write(property.toFileString());
-                writer.newLine();
-            }
-            System.out.println("Properties saved to " + filename);
-        } catch (IOException e) {
-            System.err.println("Error saving properties: " + e.getMessage());
-        }
-    }
-
     public void loadPropertiesFromFile(String filename) {
         properties.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -129,7 +128,11 @@ public class PropertyManager {
             while ((line = reader.readLine()) != null) {
                 Property property = Property.fromFileString(line);
                 if (property != null) {
-                    properties.add(property);
+                    try {
+                        addProperty(property);
+                    } catch (DuplicateAddressException e) {
+                        System.err.println("Duplicate property skipped: " + property.getAddress());
+                    }
                 }
             }
             System.out.println("Properties loaded from " + filename);
@@ -137,4 +140,3 @@ public class PropertyManager {
             System.err.println("Error loading properties: " + e.getMessage());
         }
     }
-}

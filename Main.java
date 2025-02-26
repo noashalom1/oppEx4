@@ -12,7 +12,7 @@ public class Main {
 
         // Loading properties from file
         System.out.println("\n--- Loading Properties from File ---");
-        PropertyManager.getInstance().loadPropertiesFromFile("properties.txt");
+        broker.loadPropertyList("properties.txt");
         broker.listAllProperties();
 
         // Attempt to add a property with duplicate address

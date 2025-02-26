@@ -13,7 +13,26 @@ public class Address {
         this.avenue = avenue;
         this.subdivisions = subdivisions;
     }
+    // בודקת האם הנכס הוא יחידה ראשית (ללא תתי-יחידות)
+    public boolean isMainUnit() {
+        return subdivisions.length == 0;
+    }
 
+    // בודקת אם הנכס הוא תת-יחידה של נכס אחר
+    public boolean isSubUnitOf(Address other) {
+        if (this.street != other.street || this.avenue != other.avenue) {
+            return false;
+        }
+        if (this.subdivisions.length <= other.subdivisions.length) {
+            return false;
+        }
+        for (int i = 0; i < other.subdivisions.length; i++) {
+            if (this.subdivisions[i] != other.subdivisions[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
     public double calculateDistance(Address other) {
         return Math.sqrt(Math.pow(this.street - other.street, 2) + Math.pow(this.avenue - other.avenue, 2));
     }
