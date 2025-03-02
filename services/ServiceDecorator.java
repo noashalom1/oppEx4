@@ -9,7 +9,6 @@ public abstract class ServiceDecorator extends Property {
         super(property.getSizeInSquareMeters(), property.getPrice(), property.getAddress(), property.isSold(), property.getOwner());
         this.decoratedProperty = property;
     }
-
     @Override
     public int getPrice() {
         return decoratedProperty.getPrice(); // ✅ Calls the wrapped property
