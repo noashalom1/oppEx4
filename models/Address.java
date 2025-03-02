@@ -13,9 +13,25 @@ public class Address {
         this.avenue = avenue;
         this.subdivisions = subdivisions;
     }
-    // בודקת האם הנכס הוא יחידה ראשית (ללא תתי-יחידות)
-    public boolean isMainUnit() {
-        return subdivisions.length == 0;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Address other = (Address) obj;
+        if (street != other.street || avenue != other.avenue || subdivisions.length != other.subdivisions.length) {
+            return false;
+        }
+        for (int i = 0; i < subdivisions.length; i++) {
+            if (subdivisions[i] != other.subdivisions[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // בודקת אם הנכס הוא תת-יחידה של נכס אחר
@@ -33,6 +49,7 @@ public class Address {
         }
         return true;
     }
+
     public double calculateDistance(Address other) {
         return Math.sqrt(Math.pow(this.street - other.street, 2) + Math.pow(this.avenue - other.avenue, 2));
     }
@@ -47,13 +64,38 @@ public class Address {
     }
 
     public static Address fromString(String addressString) {
-        String[] parts = addressString.split(",");
-        int street = Integer.parseInt(parts[0]);
-        int avenue = Integer.parseInt(parts[1]);
-        int[] subdivisions = new int[parts.length - 2];
-        for (int i = 2; i < parts.length; i++) {
-            subdivisions[i - 2] = Integer.parseInt(parts[i]);
+        // Check for null or empty input
+        if (addressString == null || addressString.trim().isEmpty()) {
+            System.out.println("Address string is empty");
+            return null;
         }
-        return new Address(street, avenue, subdivisions);
+
+        String[] parts = addressString.split(",");
+
+        // Ensure there are at least 2 parts (street and avenue)
+        if (parts.length < 2) {
+            System.out.println("Invalid address format");
+            return null;
+        }
+
+        try {
+            int street = Integer.parseInt(parts[0].trim());
+            int avenue = Integer.parseInt(parts[1].trim());
+
+            // Parse subdivisions (if any)
+            int[] subdivisions = new int[parts.length - 2];
+            for (int i = 2; i < parts.length; i++) {
+                subdivisions[i - 2] = Integer.parseInt(parts[i].trim());
+            }
+
+            return new Address(street, avenue, subdivisions);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number format in address string");
+            return null;
+        } catch (Exception e) {
+            System.out.println("Unexpected error while parsing address");
+            return null;
+        }
     }
+
 }
